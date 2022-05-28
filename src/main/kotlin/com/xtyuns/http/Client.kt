@@ -6,9 +6,11 @@ import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.serialization.kotlinx.json.*
 
 object Client {
+    val JSON = DefaultJson
+
     val INSTANCE = HttpClient(Java) {
         install(ContentNegotiation) {
-            json()
+            json(JSON)
         }
     }
 }

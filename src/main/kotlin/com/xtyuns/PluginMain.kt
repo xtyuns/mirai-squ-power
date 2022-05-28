@@ -6,7 +6,6 @@ import net.mamoe.mirai.console.plugin.jvm.JvmPluginDescription
 import net.mamoe.mirai.console.plugin.jvm.KotlinPlugin
 import net.mamoe.mirai.event.GlobalEventChannel
 import net.mamoe.mirai.event.events.GroupMessageEvent
-import java.time.LocalDateTime
 
 object PluginMain : KotlinPlugin(JvmPluginDescription.loadFromResource("mirai.yml")) {
     override fun onEnable() {
@@ -68,11 +67,20 @@ object PluginMain : KotlinPlugin(JvmPluginDescription.loadFromResource("mirai.ym
             return null
         }
 
-        val powerQueryMatcher = Regex("^${PowerPluginConfig.queryPrefix}\\s*(\\d+)[#＃](\\d+)\\s*$")
-        powerQueryMatcher.matchEntire(event.message.contentToString())?.let {
+        val originMsg = event.message.contentToString()
+        val powerQueryMatcher = Regex("^${PowerPluginConfig.queryPrefix}\\s*(\\d+)[#＃](\\d+)$")
+        powerQueryMatcher.matchEntire(originMsg.replace("@${event.bot.id}", "").trim())?.let {
             // 匹配到查询消息
             it.groupValues.run {
-                event.group.sendMessage("剩余电量: " + WanXiaoPowerUtils.queryPower(this[1].toInt(), this[2].toInt()))
+                try {
+                    val balancePower = WanXiaoPowerUtils.queryPower(this[1].toInt(), this[2].toInt())
+                    event.group.sendMessage("剩余电量: $balancePower")
+                } catch (e: Throwable) {
+                    event.group.sendMessage("error: ${e.toString().replace(System.lineSeparator(), "")}${System.lineSeparator()}${System.lineSeparator()}${e.stackTrace[0]}")
+                    event.bot.getFriend(PowerPluginConfig.admin)?.apply {
+                        logger.error(e)
+                    }
+                }
             }
         }
 
