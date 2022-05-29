@@ -193,16 +193,13 @@ object WanXiaoPowerUtils {
             // 9号楼101宿舍 -> "101"
             val targetRoomName = "$roomNumber"
 
+            // 32, 33 号楼的门牌号是 4 位, 其中序号占3位, 楼层占一位(共6层)
             // #32公寓101宿舍 -> "1001", #33公寓101宿舍 -> "1001"
             // 29号楼101宿舍 -> "101", 29号楼1001宿舍 -> "1001"
             // #9公寓101宿舍 -> "9101", #31公寓101宿舍 -> "31101"
 
-            // 将以上规则统一处理为 ${floor}mn 的形式, 如 101, 905, 1012
-            val roomName = if(setOf(32, 33).contains(buildNumber)) {
-                roomInfo.name.substring(0, 1) + roomInfo.name.substring(2)
-            } else {
-                roomInfo.name.substring(roomInfo.name.length - targetRoomName.length)
-            }
+            // 将以上规则统一处理为 ${floor}mn 的形式, 如 101(1001), 905, 1012
+            val roomName = roomInfo.name.substring(roomInfo.name.length - targetRoomName.length)
 
             roomInfoMap[roomName] = roomInfo.id
         }
