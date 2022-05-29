@@ -231,6 +231,13 @@ object WanXiaoPowerUtils {
         val floorNumber = roomNumber.toString()
             .padStart(4, '0')
             .substring(0, 2)
+            .let {
+                // @see #3
+                if (setOf(32, 33).contains(buildNumber)) {
+                    return@let it.substring(0, 1)
+                }
+                it
+            }
             .toInt()
 
         var areaId = ""
